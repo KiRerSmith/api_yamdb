@@ -9,6 +9,7 @@ CHOICES = (
 
 
 class User(AbstractUser):
+    password = models.CharField(max_length=10, default=None, blank=True)
     username = models.CharField(
         unique=True,
         blank=False,
@@ -25,7 +26,7 @@ class User(AbstractUser):
         max_length=300,
     )
     role = models.CharField(max_length=15, choices=CHOICES, default='user')
-    code = models.CharField(max_length=5)
+    code = models.CharField(max_length=5, blank=True)
 
     class Meta:
         constraints = (
