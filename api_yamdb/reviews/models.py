@@ -1,16 +1,24 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
-
 CHOICES = (
     ('user', 'user'),
     ('moderator', 'moderator'),
     ('admin', 'admin'),
 )
 
+
 class User(AbstractUser):
-    username = models.CharField(unique=True, blank=False, null=False, max_length=150)
-    email = models.EmailField(unique=True, blank=False, null=False, max_length=254)
+    username = models.CharField(
+        unique=True,
+        blank=False,
+        null=False,
+        max_length=150)
+    email = models.EmailField(
+        unique=True,
+        blank=False,
+        null=False,
+        max_length=254)
     bio = models.CharField(
         'Биография',
         blank=True,
