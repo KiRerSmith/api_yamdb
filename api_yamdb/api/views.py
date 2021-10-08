@@ -1,7 +1,8 @@
 from django.shortcuts import get_object_or_404
+from rest_framework.views import APIView
 from reviews.models import User
 from rest_framework import mixins, viewsets, filters, status
-from .serializers import CreateAndGetCode, UserSerializer, MeSerializer, GetTokenSerializer
+from .serializers import CreateAndGetCode, UserSerializer, MeSerializer, GetTokenSerializer, UsernameSerializer
 from rest_framework import permissions
 from .pagination import UserPagination
 from .permissions import AdminOrUser, IsAdmin
@@ -46,7 +47,7 @@ def get_token(request):
     return Response('Отсутствует обязательное поле или оно некорректно', status=status.HTTP_400_BAD_REQUEST)
 
 
-class UserViewSet(viewsets.ModelViewSet):
+class UserViewSet(mixins.ListModelMixin, mixins.CreateModelMixin, viewsets.GenericViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     pagination_class = UserPagination
@@ -59,9 +60,27 @@ class UserViewSet(viewsets.ModelViewSet):
         serializer.is_valid(raise_exception=True)
         serializer.save()
 
-class MeViewSet(mixins.RetrieveModelMixin, mixins.UpdateModelMixin, viewsets.GenericViewSet):
-    serializer_class = MeSerializer
-    permission_classes = (AdminOrUser,)
+class APIMe(APIView):
+    def get(self, request):
+        if request.user.is_authenticated:
+            user = get_object_or_404(User, id=request.user.id)
+            serializer = MeSerializer(user)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response('Необходима авторизация', status=status.HTTP_401_UNAUTHORIZED)
+
+    def patch(self, request):
+        if request.user.is_authenticated:
+            user = get_object_or_404(User, id=request.user.id)
+            serializer = MeSerializer(user, request.data, partial=True)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response('Необходима авторизация', status=status.HTTP_401_UNAUTHORIZED)
+
+class UsernameViewSet(mixins.RetrieveModelMixin, mixins.UpdateModelMixin, mixins.DestroyModelMixin, viewsets.GenericViewSet):
+    serializer_class = UsernameSerializer
+    permission_classes = None
     pagination_class = None
 
     def get_queryset(self):

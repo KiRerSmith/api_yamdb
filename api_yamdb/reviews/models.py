@@ -11,9 +11,10 @@ CHOICES = (
 class User(AbstractUser):
     username = models.CharField(unique=True, blank=False, null=False, max_length=150)
     email = models.EmailField(unique=True, blank=False, null=False, max_length=254)
-    bio = models.TextField(
+    bio = models.CharField(
         'Биография',
         blank=True,
+        max_length=300,
     )
     role = models.CharField(max_length=15, choices=CHOICES, default='user')
     code = models.CharField(max_length=5)
