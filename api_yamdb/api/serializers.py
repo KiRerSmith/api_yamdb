@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from rest_framework.serializers import ValidationError
-from reviews.models import User
+from reviews.models import Category, Comment, Genre, Review, Title, User
 
 
 class CreateAndGetCode(serializers.Serializer):
@@ -80,3 +80,17 @@ class GetTokenSerializer(serializers.Serializer):
         required=True,
         min_length=5,
         allow_blank=False)
+
+
+class ReviewSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        fields = '__all__'
+        model = Review
+
+
+class CommentSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        fields = '__all__'
+        model = Review
