@@ -18,8 +18,11 @@ class GenreSerializer(serializers.ModelSerializer):
 
 
 class TitleSerializer(serializers.ModelSerializer):
-    name = serializers.CharField(max_length=256)
-    slug = serializers.SlugField(max_length=50)
+    name = serializers.CharField(required=True, max_length=256)
+    year = serializers.IntegerField(required=True)
+    genre = serializers.CharField(required=True)
+    category = serializers.CharField(required=True)
+    # slug = serializers.SlugField(max_length=50)
 
 
     class Meta:
