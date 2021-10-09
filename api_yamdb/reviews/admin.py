@@ -8,5 +8,4 @@ class UserAdmin(admin.ModelAdmin):
     empty_value_display = "-пусто-"
 
 
-
 admin.site.register(User, UserAdmin)

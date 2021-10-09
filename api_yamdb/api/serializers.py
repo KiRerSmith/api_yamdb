@@ -41,11 +41,10 @@ class TitleSerializer(serializers.ModelSerializer):
         queryset=Category.objects.all()
     )
 
-
     class Meta:
         model = Title
         fields = ('__all__')
-    
+
     def validate_year(self, value):
         current_year = datetime.datetime.now().year
         if value > current_year:
@@ -144,4 +143,4 @@ class CommentSerializer(serializers.ModelSerializer):
 
     class Meta:
         fields = '__all__'
-        model = Review
+        model = Comment
