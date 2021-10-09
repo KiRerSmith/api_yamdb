@@ -1,3 +1,5 @@
+import datetime
+
 from rest_framework import serializers
 from rest_framework.serializers import ValidationError
 from reviews.models import Category, Comment, Genre, Review, Title, User
@@ -8,6 +10,10 @@ class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
         fields = ('name', 'slug')
+        lookup_field = 'slug'
+        extra_kwargs = {
+            'url': {'lookup_field': 'slug'}
+        }
 
 
 class GenreSerializer(serializers.ModelSerializer):
@@ -15,19 +21,37 @@ class GenreSerializer(serializers.ModelSerializer):
     class Meta:
         model = Genre
         fields = ('name', 'slug')
+        lookup_field = 'slug'
+        extra_kwargs = {
+            'url': {'lookup_field': 'slug'}
+        }
 
 
 class TitleSerializer(serializers.ModelSerializer):
     name = serializers.CharField(required=True, max_length=256)
     year = serializers.IntegerField(required=True)
-    genre = serializers.CharField(required=True)
-    category = serializers.CharField(required=True)
-    # slug = serializers.SlugField(max_length=50)
+    genre = serializers.SlugRelatedField(
+        required=True,
+        slug_field='slug',
+        queryset=Genre.objects.all()
+    )
+    category = serializers.SlugRelatedField(
+        required=True,
+        slug_field='slug',
+        queryset=Category.objects.all()
+    )
 
 
     class Meta:
         model = Title
         fields = ('__all__')
+    
+    def validate_year(self, value):
+        current_year = datetime.datetime.now().year
+        if value > current_year:
+            raise serializers.ValidationError(
+                'Это из будущего!')
+        return value
 
 
 class CreateAndGetCode(serializers.Serializer):

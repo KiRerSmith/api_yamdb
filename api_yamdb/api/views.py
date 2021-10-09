@@ -150,11 +150,7 @@ class CategoryViewSet(mixins.CreateModelMixin,
     pagination_class = UserPagination
     filter_backends = (filters.SearchFilter,)
     search_fields = ('name',)
-
-    def destroy(self, request, *args, **kwargs):
-        instance = self.get_object()
-        self.perform_destroy(instance)
-        return Response(status=status.HTTP_204_NO_CONTENT)
+    lookup_field = 'slug'
 
 
 class GenreViewSet(mixins.CreateModelMixin,
@@ -168,6 +164,7 @@ class GenreViewSet(mixins.CreateModelMixin,
     pagination_class = UserPagination
     filter_backends = (filters.SearchFilter,)
     search_fields = ('name',)
+    lookup_field = 'slug'
 
 
 class TitleViewSet(viewsets.ModelViewSet):
