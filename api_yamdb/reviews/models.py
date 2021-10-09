@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
@@ -34,6 +35,14 @@ class User(AbstractUser):
             models.UniqueConstraint(fields=["username", "email"],
                                     name="uniq_signup"),
         )
+=======
+from django.db import models
+from django.core.validators import MinValueValidator, MaxValueValidator
+
+
+class User():
+    ...
+>>>>>>> d3737c12f4e6f58f7e54ef10e5bc580632cf75ab
 
 
 class Category():

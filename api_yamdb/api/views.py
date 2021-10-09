@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 from random import randint
 
 from django.core.mail import send_mail
@@ -93,6 +94,15 @@ class APIMe(APIView):
         return Response(
             'Необходима авторизация',
             status=status.HTTP_401_UNAUTHORIZED)
+=======
+from django.shortcuts import get_object_or_404
+from reviews.models import Category, Comment, Genre, Review, Title, User
+from rest_framework import permissions, viewsets
+from rest_framework.pagination import LimitOffsetPagination
+
+from .serializers import CommentSerializer, ReviewSerializer
+from .permissions import IsOwnerOrReadOnly, IsModerator
+>>>>>>> d3737c12f4e6f58f7e54ef10e5bc580632cf75ab
 
 
 class ReviewViewSet(viewsets.ModelViewSet):
@@ -101,7 +111,11 @@ class ReviewViewSet(viewsets.ModelViewSet):
     permission_classes = [
         IsOwnerOrReadOnly,
         IsModerator,
+<<<<<<< HEAD
         IsAdmin]
+=======
+        permissions.IsAdminUser]
+>>>>>>> d3737c12f4e6f58f7e54ef10e5bc580632cf75ab
 
     def get_queryset(self):
         title_id = self.kwargs.get("title_id")
@@ -120,7 +134,11 @@ class CommentViewSet(viewsets.ModelViewSet):
     permission_classes = [
         IsOwnerOrReadOnly,
         IsModerator,
+<<<<<<< HEAD
         IsAdmin]
+=======
+        permissions.IsAdminUser]
+>>>>>>> d3737c12f4e6f58f7e54ef10e5bc580632cf75ab
 
     def get_queryset(self):
         title_id = self.kwargs.get("title_id")

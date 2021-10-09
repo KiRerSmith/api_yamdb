@@ -16,8 +16,11 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+<<<<<<< HEAD
     'rest_framework',
     'rest_framework_simplejwt',
+=======
+>>>>>>> d3737c12f4e6f58f7e54ef10e5bc580632cf75ab
     'reviews',
     'api',
 ]
@@ -93,6 +96,7 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.AllowAny',
     ],
+<<<<<<< HEAD
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
@@ -104,3 +108,6 @@ SIMPLE_JWT = {
 }
 
 AUTH_USER_MODEL = 'reviews.User'
+=======
+}
+>>>>>>> d3737c12f4e6f58f7e54ef10e5bc580632cf75ab
