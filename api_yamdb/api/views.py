@@ -141,7 +141,6 @@ class CommentViewSet(viewsets.ModelViewSet):
 
 class CategoryViewSet(mixins.CreateModelMixin,
                       mixins.ListModelMixin,
-                      mixins.RetrieveModelMixin,
                       mixins.DestroyModelMixin,
                       viewsets.GenericViewSet):
     queryset = Category.objects.all()
@@ -155,7 +154,6 @@ class CategoryViewSet(mixins.CreateModelMixin,
 
 class GenreViewSet(mixins.CreateModelMixin,
                    mixins.ListModelMixin,
-                   mixins.RetrieveModelMixin,
                    mixins.DestroyModelMixin,
                    viewsets.GenericViewSet):
     queryset = Genre.objects.all()

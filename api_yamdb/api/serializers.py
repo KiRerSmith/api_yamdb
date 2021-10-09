@@ -40,6 +40,7 @@ class TitleSerializer(serializers.ModelSerializer):
         slug_field='slug',
         queryset=Category.objects.all()
     )
+    rating = serializers.SerializerMethodField()
 
 
     class Meta:
@@ -52,6 +53,9 @@ class TitleSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(
                 'Это из будущего!')
         return value
+    
+    def get_rating(self, obj):
+        return None
 
 
 class CreateAndGetCode(serializers.Serializer):

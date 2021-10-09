@@ -93,7 +93,7 @@ class GenreTitle(models.Model):
         related_name='title_id'
     )
     genre_id = models.ForeignKey(
-        Genre, on_delete=models.SET_NULL,
+        Genre, on_delete=models.CASCADE,
         blank=True, null=True,
         related_name='genre_id'
     )
