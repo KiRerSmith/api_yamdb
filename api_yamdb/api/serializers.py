@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 from rest_framework import serializers
 from rest_framework.serializers import ValidationError
 from reviews.models import Category, Comment, Genre, Review, Title, User
@@ -81,10 +80,6 @@ class GetTokenSerializer(serializers.Serializer):
         required=True,
         min_length=5,
         allow_blank=False)
-=======
-from reviews.models import Category, Comment, Genre, Review, Title, User
-from rest_framework import serializers
->>>>>>> d3737c12f4e6f58f7e54ef10e5bc580632cf75ab
 
 
 class ReviewSerializer(serializers.ModelSerializer):
