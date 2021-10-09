@@ -18,6 +18,9 @@ class GenreSerializer(serializers.ModelSerializer):
 
 
 class TitleSerializer(serializers.ModelSerializer):
+    name = serializers.CharField(max_length=256)
+    slug = serializers.SlugField(max_length=50)
+
 
     class Meta:
         model = Title
