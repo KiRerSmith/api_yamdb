@@ -1,5 +1,4 @@
 from django.urls import include, path
-
 from rest_framework import routers
 
 from .views import APIMe, UserViewSet, create_and_get_code, get_token
@@ -15,6 +14,9 @@ router.register(
     r'titles/(?P<title_id>[^/.]+)/reviews/(?P<review_id>[^/.]+)/comments',
     views.CommentViewSet,
     basename='comments')
+router.register(r'categories', views.CategoryViewSet, basename='categories')
+router.register(r'genres', views.GenreViewSet, basename='genres')
+router.register(r'titles', views.TitleViewSet, basename='titles')
 
 urlpatterns = [
     path('v1/auth/signup/', create_and_get_code, name='create_and_get_code'),

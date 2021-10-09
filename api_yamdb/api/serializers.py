@@ -3,6 +3,27 @@ from rest_framework.serializers import ValidationError
 from reviews.models import Category, Comment, Genre, Review, Title, User
 
 
+class CategorySerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Category
+        fields = ('name', 'slug')
+
+
+class GenreSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Genre
+        fields = ('name', 'slug')
+
+
+class TitleSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Title
+        fields = ('__all__')
+
+
 class CreateAndGetCode(serializers.Serializer):
     username = serializers.CharField(
         required=True,
