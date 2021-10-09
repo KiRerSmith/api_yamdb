@@ -10,7 +10,6 @@ CHOICES = (
 
 
 class User(AbstractUser):
-    password = models.CharField(max_length=10, default=None, blank=True)
     username = models.CharField(
         unique=True,
         blank=False,

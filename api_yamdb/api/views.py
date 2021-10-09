@@ -13,7 +13,7 @@ from rest_framework_simplejwt.tokens import AccessToken
 from reviews.models import Category, Comment, Genre, Review, Title, User
 
 from .pagination import UserPagination
-from .permissions import IsAdmin, IsOwnerOrReadOnly, IsModerator
+from .permissions import IsAdmin, IsOwnerOrReadOnly, IsModerator, AdminOrUser
 from .serializers import (CreateAndGetCode, GetTokenSerializer, MeSerializer,
                           UserSerializer, CommentSerializer, ReviewSerializer)
 from .serializers import CategorySerializer, GenreSerializer, TitleSerializer
