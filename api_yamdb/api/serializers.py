@@ -2,7 +2,7 @@ import datetime
 
 from rest_framework import serializers
 from rest_framework.serializers import ValidationError
-from reviews.models import Category, Comment, Genre, Review, Title, User
+from reviews.models import Category, Comment, Genre, Review, Title, User, GenreTitle
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -41,7 +41,6 @@ class TitleSerializer(serializers.ModelSerializer):
         slug_field='slug',
         queryset=Category.objects.all()
     )
-    rating = serializers.SerializerMethodField()
 
     class Meta:
         model = Title
@@ -53,9 +52,17 @@ class TitleSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(
                 'Это из будущего!')
         return value
-    
-    def get_rating(self, obj):
-        return None
+
+
+class TitleListSerializer(serializers.ModelSerializer):
+    name = serializers.CharField(required=True, max_length=256)
+    year = serializers.IntegerField(required=True)
+    genre = GenreSerializer(many=True, required=True)
+    category = CategorySerializer(required=True)
+
+    class Meta:
+        model = Title
+        fields = ('__all__')
 
 
 class CreateAndGetCode(serializers.Serializer):

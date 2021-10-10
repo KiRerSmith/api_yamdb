@@ -17,7 +17,7 @@ from .permissions import (IsAdmin, IsOwnerOrReadOnly, IsModerator,
                           IsAdminOrReadOnly)
 from .serializers import (CreateAndGetCode, GetTokenSerializer, MeSerializer,
                           UserSerializer, CommentSerializer, ReviewSerializer)
-from .serializers import CategorySerializer, GenreSerializer, TitleSerializer
+from .serializers import CategorySerializer, GenreSerializer, TitleSerializer, TitleListSerializer
 
 
 @api_view(['POST'])
@@ -173,3 +173,8 @@ class TitleViewSet(viewsets.ModelViewSet):
     pagination_class = UserPagination
     filter_backends = (DjangoFilterBackend,)
     filterset_fields = ('category__slug', 'genre__slug', 'name', 'year')
+
+    def get_serializer_class(self):
+        if self.action == 'list' or self.action == 'retrieve':
+            return TitleListSerializer
+        return TitleSerializer
