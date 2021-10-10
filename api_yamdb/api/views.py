@@ -14,7 +14,8 @@ from rest_framework_simplejwt.tokens import AccessToken
 from reviews.models import Category, Comment, Genre, Review, Title, User
 
 from .pagination import UserPagination
-from .permissions import (IsAdmin, IsOwnerOrReadOnly, IsModerator,
+from .permissions import (IsAdmin,
+                          IsOwnerAdminModeratorOrReadOnly,
                           IsAdminOrReadOnly)
 from .serializers import (CreateAndGetCode, GetTokenSerializer, MeSerializer,
                           UserSerializer, CommentSerializer, ReviewSerializer)
@@ -103,8 +104,7 @@ class APIMe(APIView):
 class ReviewViewSet(viewsets.ModelViewSet):
     serializer_class = ReviewSerializer
     pagination_class = UserPagination
-    permission_classes = [
-        IsOwnerOrReadOnly]
+    permission_classes = [IsOwnerAdminModeratorOrReadOnly]
 
     def get_queryset(self):
         title_id = self.kwargs.get("title_id")
@@ -125,8 +125,7 @@ class ReviewViewSet(viewsets.ModelViewSet):
 class CommentViewSet(viewsets.ModelViewSet):
     serializer_class = CommentSerializer
     pagination_class = LimitOffsetPagination
-    permission_classes = [
-        IsOwnerOrReadOnly]
+    permission_classes = [IsOwnerAdminModeratorOrReadOnly]
 
     def get_queryset(self):
         title_id = self.kwargs.get("title_id")
