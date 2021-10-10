@@ -1,7 +1,7 @@
 import datetime
 
 from rest_framework import serializers
-from rest_framework.serializers import ValidationError, UniqueTogetherValidator
+from rest_framework.serializers import ValidationError
 from reviews.models import Category, Comment, Genre, Review, Title, User
 
 
@@ -75,6 +75,7 @@ class TitleListSerializer(serializers.ModelSerializer):
                 score += review.score
             return score // i
         return None
+
 
 class CreateAndGetCode(serializers.Serializer):
     username = serializers.CharField(
@@ -167,7 +168,9 @@ class ReviewSerializer(serializers.ModelSerializer):
 
 
 class CommentSerializer(serializers.ModelSerializer):
+    author = serializers.SlugRelatedField(
+        read_only=True, slug_field='username')
 
     class Meta:
-        fields = '__all__'
+        fields = ('id', 'text', 'author', 'pub_date')
         model = Comment

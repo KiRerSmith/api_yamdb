@@ -9,7 +9,6 @@ from rest_framework import filters, mixins, serializers, status, viewsets
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework.pagination import LimitOffsetPagination
 from rest_framework_simplejwt.tokens import AccessToken
 from reviews.models import Category, Comment, Genre, Review, Title, User
 
@@ -124,7 +123,7 @@ class ReviewViewSet(viewsets.ModelViewSet):
 
 class CommentViewSet(viewsets.ModelViewSet):
     serializer_class = CommentSerializer
-    pagination_class = LimitOffsetPagination
+    pagination_class = UserPagination
     permission_classes = [IsOwnerAdminModeratorOrReadOnly]
 
     def get_queryset(self):
@@ -138,8 +137,8 @@ class CommentViewSet(viewsets.ModelViewSet):
         title_id = self.kwargs.get("title_id")
         get_object_or_404(Title, pk=title_id)
         review_id = self.kwargs.get("review_id")
-        get_object_or_404(Review, pk=review_id)
-        serializer.save(author=self.request.user)
+        review = get_object_or_404(Review, pk=review_id)
+        serializer.save(author=self.request.user, review=review)
 
 
 class CategoryViewSet(mixins.CreateModelMixin,
