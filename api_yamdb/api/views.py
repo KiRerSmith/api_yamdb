@@ -5,7 +5,7 @@ from django_filters.filters import CharFilter
 from django_filters.rest_framework import DjangoFilterBackend, FilterSet
 from django.shortcuts import get_object_or_404
 
-from rest_framework import filters, mixins, status, viewsets
+from rest_framework import filters, mixins, serializers, status, viewsets
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -102,11 +102,9 @@ class APIMe(APIView):
 
 class ReviewViewSet(viewsets.ModelViewSet):
     serializer_class = ReviewSerializer
-    pagination_class = LimitOffsetPagination
+    pagination_class = UserPagination
     permission_classes = [
-        IsOwnerOrReadOnly,
-        IsModerator,
-        IsAdmin]
+        IsOwnerOrReadOnly]
 
     def get_queryset(self):
         title_id = self.kwargs.get("title_id")
@@ -115,17 +113,20 @@ class ReviewViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         title_id = self.kwargs.get("title_id")
-        get_object_or_404(Title, pk=title_id)
-        serializer.save(author=self.request.user)
+        title = get_object_or_404(Title, pk=title_id)
+        author = self.request.user
+        if Review.objects.filter(author=author, title=title):
+            raise serializers.ValidationError(
+                'Нельзя добавить больше одной рецензии на произведение!')
+        serializer.save(author=author,
+                        title=title)
 
 
 class CommentViewSet(viewsets.ModelViewSet):
     serializer_class = CommentSerializer
     pagination_class = LimitOffsetPagination
     permission_classes = [
-        IsOwnerOrReadOnly,
-        IsModerator,
-        IsAdmin]
+        IsOwnerOrReadOnly]
 
     def get_queryset(self):
         title_id = self.kwargs.get("title_id")

@@ -1,7 +1,7 @@
 import datetime
 
 from rest_framework import serializers
-from rest_framework.serializers import ValidationError
+from rest_framework.serializers import ValidationError, UniqueTogetherValidator
 from reviews.models import Category, Comment, Genre, Review, Title, User
 
 
@@ -145,6 +145,10 @@ class GetTokenSerializer(serializers.Serializer):
 
 
 class ReviewSerializer(serializers.ModelSerializer):
+    author = serializers.SlugRelatedField(
+        read_only=True, slug_field='username')
+    title = serializers.SlugRelatedField(
+        read_only=True, slug_field='name')
 
     class Meta:
         fields = '__all__'
