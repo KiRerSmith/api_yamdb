@@ -1,6 +1,6 @@
 from django.contrib.auth.models import AbstractUser
+from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
-from django.core.validators import MinValueValidator, MaxValueValidator
 
 CHOICES = (
     ('user', 'user'),
@@ -109,11 +109,17 @@ class Review(models.Model):
     text = models.TextField()
     score = models.IntegerField(
         validators=[
-            MaxValueValidator(100),
+            MaxValueValidator(10),
             MinValueValidator(1)
         ]
     )
     pub_date = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=['author', 'title'], name='unique_review'),
+        ]
 
 
 class Comment(models.Model):

@@ -14,15 +14,16 @@ class AdminOrUser(permissions.BasePermission):
         return request.user.is_authenticated
 
 
-class IsModerator(permissions.BasePermission):
+class IsOwnerAdminModeratorOrReadOnly(permissions.BasePermission):
+
     def has_permission(self, request, view):
-        if request.user.is_authenticated:
-            return request.user.role == 'moderator'
+        return (request.method in permissions.SAFE_METHODS
+                or request.user.is_authenticated)
 
-
-class IsOwnerOrReadOnly(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
         if request.method in permissions.SAFE_METHODS:
+            return True
+        elif request.user.role == 'admin' or request.user.role == 'moderator':
             return True
         return obj.author == request.user
 

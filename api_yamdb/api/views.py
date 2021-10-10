@@ -1,25 +1,24 @@
 from random import randint
 
 from django.core.mail import send_mail
-from django_filters.filters import CharFilter
-from django_filters.rest_framework import DjangoFilterBackend, FilterSet
 from django.shortcuts import get_object_or_404
 
-from rest_framework import filters, mixins, status, viewsets
+from django_filters.filters import CharFilter
+from django_filters.rest_framework import DjangoFilterBackend, FilterSet
+from rest_framework import filters, mixins, serializers, status, viewsets
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework.pagination import LimitOffsetPagination
 from rest_framework_simplejwt.tokens import AccessToken
 from reviews.models import Category, Comment, Genre, Review, Title, User
 
 from .pagination import UserPagination
-from .permissions import (IsAdmin, IsOwnerOrReadOnly, IsModerator,
-                          IsAdminOrReadOnly)
-from .serializers import (CreateAndGetCode, GetTokenSerializer, MeSerializer,
-                          UserSerializer, CommentSerializer, ReviewSerializer)
-from .serializers import (CategorySerializer, GenreSerializer,
-                          TitleSerializer, TitleListSerializer)
+from .permissions import (IsAdmin, IsAdminOrReadOnly,
+                          IsOwnerAdminModeratorOrReadOnly)
+from .serializers import (CategorySerializer, CommentSerializer,
+                          CreateAndGetCode, GenreSerializer,
+                          GetTokenSerializer, MeSerializer, ReviewSerializer,
+                          TitleListSerializer, TitleSerializer, UserSerializer)
 
 
 @api_view(['POST'])
@@ -102,11 +101,8 @@ class APIMe(APIView):
 
 class ReviewViewSet(viewsets.ModelViewSet):
     serializer_class = ReviewSerializer
-    pagination_class = LimitOffsetPagination
-    permission_classes = [
-        IsOwnerOrReadOnly,
-        IsModerator,
-        IsAdmin]
+    pagination_class = UserPagination
+    permission_classes = [IsOwnerAdminModeratorOrReadOnly]
 
     def get_queryset(self):
         title_id = self.kwargs.get("title_id")
@@ -115,17 +111,19 @@ class ReviewViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         title_id = self.kwargs.get("title_id")
-        get_object_or_404(Title, pk=title_id)
-        serializer.save(author=self.request.user)
+        title = get_object_or_404(Title, pk=title_id)
+        author = self.request.user
+        if Review.objects.filter(author=author, title=title):
+            raise serializers.ValidationError(
+                'Нельзя добавить больше одной рецензии на произведение!')
+        serializer.save(author=author,
+                        title=title)
 
 
 class CommentViewSet(viewsets.ModelViewSet):
     serializer_class = CommentSerializer
-    pagination_class = LimitOffsetPagination
-    permission_classes = [
-        IsOwnerOrReadOnly,
-        IsModerator,
-        IsAdmin]
+    pagination_class = UserPagination
+    permission_classes = [IsOwnerAdminModeratorOrReadOnly]
 
     def get_queryset(self):
         title_id = self.kwargs.get("title_id")
@@ -138,8 +136,8 @@ class CommentViewSet(viewsets.ModelViewSet):
         title_id = self.kwargs.get("title_id")
         get_object_or_404(Title, pk=title_id)
         review_id = self.kwargs.get("review_id")
-        get_object_or_404(Review, pk=review_id)
-        serializer.save(author=self.request.user)
+        review = get_object_or_404(Review, pk=review_id)
+        serializer.save(author=self.request.user, review=review)
 
 
 class CategoryViewSet(mixins.CreateModelMixin,
