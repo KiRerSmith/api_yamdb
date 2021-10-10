@@ -59,11 +59,22 @@ class TitleListSerializer(serializers.ModelSerializer):
     year = serializers.IntegerField(required=True)
     genre = GenreSerializer(many=True, required=True)
     category = CategorySerializer(required=True)
+    rating = serializers.SerializerMethodField()
 
     class Meta:
         model = Title
         fields = ('__all__')
 
+    def get_rating(self, obj):
+        reviews = obj.review.all()
+        if reviews.count() != 0:
+            score = 0
+            i = 0
+            for review in reviews:
+                i += 1
+                score += review.score
+            return score // i
+        return None
 
 class CreateAndGetCode(serializers.Serializer):
     username = serializers.CharField(

@@ -109,7 +109,7 @@ class Review(models.Model):
     text = models.TextField()
     score = models.IntegerField(
         validators=[
-            MaxValueValidator(100),
+            MaxValueValidator(10),
             MinValueValidator(1)
         ]
     )
