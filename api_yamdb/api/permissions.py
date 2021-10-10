@@ -8,12 +8,6 @@ class IsAdmin(permissions.BasePermission):
             return request.user.is_superuser or request.user.role == 'admin'
 
 
-class AdminOrUser(permissions.BasePermission):
-
-    def has_permission(self, request, view):
-        return request.user.is_authenticated
-
-
 class IsOwnerAdminModeratorOrReadOnly(permissions.BasePermission):
 
     def has_permission(self, request, view):
