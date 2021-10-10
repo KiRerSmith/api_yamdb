@@ -106,10 +106,10 @@ class Review(models.Model):
     title = models.ForeignKey(Title,
                               on_delete=models.CASCADE,
                               related_name='review')
-    text = models.TextField()
+    text = models.CharField(max_length=150)
     score = models.IntegerField(
         validators=[
-            MaxValueValidator(100),
+            MaxValueValidator(10),
             MinValueValidator(1)
         ]
     )

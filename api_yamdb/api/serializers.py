@@ -41,10 +41,16 @@ class TitleSerializer(serializers.ModelSerializer):
         slug_field='slug',
         queryset=Category.objects.all()
     )
+    rating = serializers.SerializerMethodField
 
     class Meta:
         model = Title
-        fields = ('__all__')
+        fields = ('id', 'name', 'year', 'rating', 'description', 'genre',
+                  'category')
+
+    def get_rating(self, obj):
+        obj.review.
+        pass
 
     def validate_year(self, value):
         current_year = datetime.datetime.now().year
@@ -145,10 +151,19 @@ class GetTokenSerializer(serializers.Serializer):
 
 
 class ReviewSerializer(serializers.ModelSerializer):
+    author = serializers.SlugRelatedField(
+        read_only=True, slug_field='username')
+    text = serializers.CharField(required=True, allow_blank=False)
+    score = serializers.IntegerField(required=True, max_value=10, min_value=1)
 
     class Meta:
-        fields = '__all__'
+        fields = ('id', 'text', 'author', 'score', 'pub_date')
         model = Review
+        read_only_fields = ('author', 'title')
+    
+    '''def validate(self, data):
+        self.
+        return '''
 
 
 class CommentSerializer(serializers.ModelSerializer):

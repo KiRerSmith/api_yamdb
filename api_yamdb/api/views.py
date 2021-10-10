@@ -9,13 +9,12 @@ from rest_framework import filters, mixins, status, viewsets
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework.pagination import LimitOffsetPagination
 from rest_framework_simplejwt.tokens import AccessToken
 from reviews.models import Category, Comment, Genre, Review, Title, User
 
 from .pagination import UserPagination
 from .permissions import (IsAdmin, IsOwnerOrReadOnly, IsModerator,
-                          IsAdminOrReadOnly)
+                          IsAdminOrReadOnly, ReviewPermission)
 from .serializers import (CreateAndGetCode, GetTokenSerializer, MeSerializer,
                           UserSerializer, CommentSerializer, ReviewSerializer)
 from .serializers import (CategorySerializer, GenreSerializer,
@@ -102,11 +101,8 @@ class APIMe(APIView):
 
 class ReviewViewSet(viewsets.ModelViewSet):
     serializer_class = ReviewSerializer
-    pagination_class = LimitOffsetPagination
-    permission_classes = [
-        IsOwnerOrReadOnly,
-        IsModerator,
-        IsAdmin]
+    pagination_class = UserPagination
+    permission_classes = [ReviewPermission]
 
     def get_queryset(self):
         title_id = self.kwargs.get("title_id")
@@ -115,13 +111,13 @@ class ReviewViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         title_id = self.kwargs.get("title_id")
-        get_object_or_404(Title, pk=title_id)
-        serializer.save(author=self.request.user)
+        title = get_object_or_404(Title, pk=title_id)
+        serializer.save(author=self.request.user, title=title)
 
 
 class CommentViewSet(viewsets.ModelViewSet):
     serializer_class = CommentSerializer
-    pagination_class = LimitOffsetPagination
+    pagination_class = UserPagination
     permission_classes = [
         IsOwnerOrReadOnly,
         IsModerator,
