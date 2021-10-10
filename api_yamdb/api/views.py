@@ -1,7 +1,8 @@
 from random import randint
 
 from django.core.mail import send_mail
-from django_filters.rest_framework import DjangoFilterBackend
+from django_filters.filters import CharFilter
+from django_filters.rest_framework import DjangoFilterBackend, FilterSet
 from django.shortcuts import get_object_or_404
 
 from rest_framework import filters, mixins, status, viewsets
@@ -17,7 +18,8 @@ from .permissions import (IsAdmin, IsOwnerOrReadOnly, IsModerator,
                           IsAdminOrReadOnly)
 from .serializers import (CreateAndGetCode, GetTokenSerializer, MeSerializer,
                           UserSerializer, CommentSerializer, ReviewSerializer)
-from .serializers import CategorySerializer, GenreSerializer, TitleSerializer, TitleListSerializer
+from .serializers import (CategorySerializer, GenreSerializer,
+                          TitleSerializer, TitleListSerializer)
 
 
 @api_view(['POST'])
@@ -166,13 +168,23 @@ class GenreViewSet(mixins.CreateModelMixin,
     lookup_field = 'slug'
 
 
+class TitleFilter(FilterSet):
+    category = CharFilter(field_name='category__slug')
+    genre = CharFilter(field_name='genre__slug')
+    name = CharFilter(field_name='name', lookup_expr='contains')
+
+    class Meta:
+        model = Title
+        fields = ['category', 'genre', 'name', 'year']
+
+
 class TitleViewSet(viewsets.ModelViewSet):
     queryset = Title.objects.all()
     serializer_class = TitleSerializer
     permission_classes = [IsAdminOrReadOnly]
     pagination_class = UserPagination
     filter_backends = (DjangoFilterBackend,)
-    filterset_fields = ('category__slug', 'genre__slug', 'name', 'year')
+    filterset_class = TitleFilter
 
     def get_serializer_class(self):
         if self.action == 'list' or self.action == 'retrieve':

@@ -2,7 +2,7 @@ import datetime
 
 from rest_framework import serializers
 from rest_framework.serializers import ValidationError
-from reviews.models import Category, Comment, Genre, Review, Title, User, GenreTitle
+from reviews.models import Category, Comment, Genre, Review, Title, User
 
 
 class CategorySerializer(serializers.ModelSerializer):
