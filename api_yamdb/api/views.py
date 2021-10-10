@@ -1,10 +1,10 @@
 from random import randint
 
 from django.core.mail import send_mail
-from django_filters.filters import CharFilter
-from django_filters.rest_framework import DjangoFilterBackend, FilterSet
 from django.shortcuts import get_object_or_404
 
+from django_filters.filters import CharFilter
+from django_filters.rest_framework import DjangoFilterBackend, FilterSet
 from rest_framework import filters, mixins, serializers, status, viewsets
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -13,13 +13,12 @@ from rest_framework_simplejwt.tokens import AccessToken
 from reviews.models import Category, Comment, Genre, Review, Title, User
 
 from .pagination import UserPagination
-from .permissions import (IsAdmin,
-                          IsOwnerAdminModeratorOrReadOnly,
-                          IsAdminOrReadOnly)
-from .serializers import (CreateAndGetCode, GetTokenSerializer, MeSerializer,
-                          UserSerializer, CommentSerializer, ReviewSerializer)
-from .serializers import (CategorySerializer, GenreSerializer,
-                          TitleSerializer, TitleListSerializer)
+from .permissions import (IsAdmin, IsAdminOrReadOnly,
+                          IsOwnerAdminModeratorOrReadOnly)
+from .serializers import (CategorySerializer, CommentSerializer,
+                          CreateAndGetCode, GenreSerializer,
+                          GetTokenSerializer, MeSerializer, ReviewSerializer,
+                          TitleListSerializer, TitleSerializer, UserSerializer)
 
 
 @api_view(['POST'])
