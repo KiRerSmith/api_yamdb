@@ -66,15 +66,7 @@ class TitleListSerializer(serializers.ModelSerializer):
         fields = ('__all__')
 
     def get_rating(self, obj):
-        reviews = obj.review.all()
-        if reviews.count() != 0:
-            score = 0
-            i = 0
-            for review in reviews:
-                i += 1
-                score += review.score
-            return score // i
-        return None
+        return obj.rating
 
 
 class CreateAndGetCode(serializers.Serializer):

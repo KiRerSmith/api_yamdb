@@ -3,6 +3,8 @@ from random import randint
 from django.core.mail import send_mail
 from django.shortcuts import get_object_or_404
 
+from django.db.models import Avg
+
 from django_filters.filters import CharFilter
 from django_filters.rest_framework import DjangoFilterBackend, FilterSet
 from rest_framework import filters, mixins, serializers, status, viewsets
@@ -177,7 +179,7 @@ class TitleFilter(FilterSet):
 
 
 class TitleViewSet(viewsets.ModelViewSet):
-    queryset = Title.objects.all()
+    queryset = Title.objects.annotate(rating=Avg('review__score'))
     serializer_class = TitleSerializer
     permission_classes = [IsAdminOrReadOnly]
     pagination_class = UserPagination
