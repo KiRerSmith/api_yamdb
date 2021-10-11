@@ -21,6 +21,7 @@ from .serializers import (CategorySerializer, CommentSerializer,
                           CreateAndGetCode, GenreSerializer,
                           GetTokenSerializer, MeSerializer, ReviewSerializer,
                           TitleListSerializer, TitleSerializer, UserSerializer)
+from api_yamdb.settings import ADMIN_EMAIL
 
 
 @api_view(['POST'])
@@ -34,7 +35,7 @@ def create_and_get_code(request):
     send_mail(
         subject='Код подтверждения для YAMDB',
         message=message,
-        from_email='admin@yamdb.ru',
+        from_email=ADMIN_EMAIL,
         recipient_list=[email]
     )
     User.objects.create(username=username, email=email, code=confirmation_code)
