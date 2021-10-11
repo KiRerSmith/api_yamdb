@@ -27,7 +27,7 @@ class GenreSerializer(serializers.ModelSerializer):
         }
 
 
-class TitleSerializer(serializers.ModelSerializer):
+class TitleWriteSerializer(serializers.ModelSerializer):
     name = serializers.CharField(required=True, max_length=256)
     year = serializers.IntegerField(required=True)
     genre = serializers.SlugRelatedField(
@@ -54,7 +54,7 @@ class TitleSerializer(serializers.ModelSerializer):
         return value
 
 
-class TitleListSerializer(serializers.ModelSerializer):
+class TitleReadSerializer(serializers.ModelSerializer):
     name = serializers.CharField(required=True, max_length=256)
     year = serializers.IntegerField(required=True)
     genre = GenreSerializer(many=True, required=True)

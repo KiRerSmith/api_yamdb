@@ -20,7 +20,8 @@ from .permissions import (IsAdmin, IsAdminOrReadOnly,
 from .serializers import (CategorySerializer, CommentSerializer,
                           CreateAndGetCode, GenreSerializer,
                           GetTokenSerializer, MeSerializer, ReviewSerializer,
-                          TitleListSerializer, TitleSerializer, UserSerializer)
+                          TitleReadSerializer, TitleWriteSerializer,
+                          UserSerializer)
 from api_yamdb.settings import ADMIN_EMAIL
 
 
@@ -181,7 +182,7 @@ class TitleFilter(FilterSet):
 
 class TitleViewSet(viewsets.ModelViewSet):
     queryset = Title.objects.annotate(rating=Avg('review__score'))
-    serializer_class = TitleSerializer
+    serializer_class = TitleWriteSerializer
     permission_classes = [IsAdminOrReadOnly]
     pagination_class = UserPagination
     filter_backends = (DjangoFilterBackend,)
@@ -189,5 +190,5 @@ class TitleViewSet(viewsets.ModelViewSet):
 
     def get_serializer_class(self):
         if self.action == 'list' or self.action == 'retrieve':
-            return TitleListSerializer
-        return TitleSerializer
+            return TitleReadSerializer
+        return TitleWriteSerializer
