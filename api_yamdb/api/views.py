@@ -12,7 +12,7 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import AccessToken
-from reviews.models import Category, Comment, Genre, Review, Title, User
+from reviews.models import Category, Genre, Review, Title, User
 
 from .pagination import UserPagination
 from .permissions import (IsAdmin, IsAdminOrReadOnly,
@@ -132,7 +132,7 @@ class CommentViewSet(viewsets.ModelViewSet):
         get_object_or_404(Title, pk=title_id)
         review_id = self.kwargs.get("review_id")
         review = get_object_or_404(Review, pk=review_id)
-        return Comment.objects.filter(review=review)
+        return review.comment.all()
 
     def perform_create(self, serializer):
         title_id = self.kwargs.get("title_id")
