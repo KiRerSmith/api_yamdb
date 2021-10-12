@@ -20,9 +20,7 @@ class Command(BaseCommand):
         return apps.get_app_config('reviews').path
 
     def get_csv_file(self, filename):
-        app_path = self.get_current_app_path()
-        file_path = os.path.join(app_path, "management",
-                                 "commands", filename)
+        file_path = os.path.join("static", "data", filename)
         return file_path
 
     def clear_model(self):
@@ -57,11 +55,11 @@ class Command(BaseCommand):
                 for row in csv_reader:
                     if row != '' and line_count >= 1:
                         data = {}
-                        data['name'] = row[2]
-                        data['slug'] = row[3]
+                        data['name'] = row[1]
+                        data['slug'] = row[2]
                         if data['slug'] not in genre_slug:
                             genre_slug.append(data['slug'])
-                            self.insert_currency_to_db(data)
+                            self.insert_genre_to_db(data)
                     line_count += 1
             self.stdout.write(
                 self.style.SUCCESS(
