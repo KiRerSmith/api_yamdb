@@ -1,9 +1,7 @@
-from random import randint
-
+from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.core.mail import send_mail
-from django.shortcuts import get_object_or_404
-
 from django.db.models import Avg
+from django.shortcuts import get_object_or_404
 
 from django_filters.filters import CharFilter
 from django_filters.rest_framework import DjangoFilterBackend, FilterSet
@@ -12,7 +10,6 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import AccessToken
-from reviews.models import Category, Genre, Review, Title, User
 
 from .pagination import UserPagination
 from .permissions import (IsAdmin, IsAdminOrReadOnly,
@@ -23,6 +20,9 @@ from .serializers import (CategorySerializer, CommentSerializer,
                           TitleReadSerializer, TitleWriteSerializer,
                           UserSerializer)
 from api_yamdb.settings import ADMIN_EMAIL
+from reviews.models import Category, Genre, Review, Title, User
+
+confirmation_token = PasswordResetTokenGenerator()
 
 
 @api_view(['POST'])
@@ -31,7 +31,8 @@ def create_and_get_code(request):
     serializer.is_valid(raise_exception=True)
     email = serializer.validated_data.get('email')
     username = serializer.validated_data.get('username')
-    confirmation_code = randint(10000, 99999)
+    user = User.objects.create(username=username, email=email)
+    confirmation_code = confirmation_token.make_token(user=user)
     message = f'Ваш код {confirmation_code}'
     send_mail(
         subject='Код подтверждения для YAMDB',
@@ -39,7 +40,6 @@ def create_and_get_code(request):
         from_email=ADMIN_EMAIL,
         recipient_list=[email]
     )
-    User.objects.create(username=username, email=email, code=confirmation_code)
     return Response(
         {'email': f'{email}', 'username': f'{username}'},
         status=status.HTTP_200_OK)
@@ -56,7 +56,7 @@ def get_token(request):
             'Пользователь не найден',
             status=status.HTTP_404_NOT_FOUND)
     user = User.objects.get(username=username)
-    if user.code == code:
+    if confirmation_token.check_token(user, code):
         token = AccessToken.for_user(user)
         return Response({'token': f'{token}'}, status=status.HTTP_200_OK)
     return Response(
@@ -109,12 +109,12 @@ class ReviewViewSet(viewsets.ModelViewSet):
     permission_classes = [IsOwnerAdminModeratorOrReadOnly]
 
     def get_queryset(self):
-        title_id = self.kwargs.get("title_id")
+        title_id = self.kwargs.get('title_id')
         title = get_object_or_404(Title, pk=title_id)
-        return Review.objects.filter(title=title)
+        return Review.objects.filter(title=title).order_by('pub_date')
 
     def perform_create(self, serializer):
-        title_id = self.kwargs.get("title_id")
+        title_id = self.kwargs.get('title_id')
         title = get_object_or_404(Title, pk=title_id)
         author = self.request.user
         if Review.objects.filter(author=author, title=title):
@@ -130,17 +130,15 @@ class CommentViewSet(viewsets.ModelViewSet):
     permission_classes = [IsOwnerAdminModeratorOrReadOnly]
 
     def get_queryset(self):
-        title_id = self.kwargs.get("title_id")
-        get_object_or_404(Title, pk=title_id)
-        review_id = self.kwargs.get("review_id")
-        review = get_object_or_404(Review, pk=review_id)
-        return review.comment.all()
+        title_id = self.kwargs.get('title_id')
+        review_id = self.kwargs.get('review_id')
+        review = get_object_or_404(Review, pk=review_id, title_id=title_id)
+        return review.comment.all().order_by('pub_date')
 
     def perform_create(self, serializer):
-        title_id = self.kwargs.get("title_id")
-        get_object_or_404(Title, pk=title_id)
-        review_id = self.kwargs.get("review_id")
-        review = get_object_or_404(Review, pk=review_id)
+        title_id = self.kwargs.get('title_id')
+        review_id = self.kwargs.get('review_id')
+        review = get_object_or_404(Review, pk=review_id, title_id=title_id)
         serializer.save(author=self.request.user, review=review)
 
 
@@ -148,7 +146,7 @@ class CategoryViewSet(mixins.CreateModelMixin,
                       mixins.ListModelMixin,
                       mixins.DestroyModelMixin,
                       viewsets.GenericViewSet):
-    queryset = Category.objects.all()
+    queryset = Category.objects.all().order_by('name')
     serializer_class = CategorySerializer
     permission_classes = [IsAdminOrReadOnly]
     pagination_class = UserPagination
@@ -161,7 +159,7 @@ class GenreViewSet(mixins.CreateModelMixin,
                    mixins.ListModelMixin,
                    mixins.DestroyModelMixin,
                    viewsets.GenericViewSet):
-    queryset = Genre.objects.all()
+    queryset = Genre.objects.all().order_by('name')
     serializer_class = GenreSerializer
     permission_classes = [IsAdminOrReadOnly]
     pagination_class = UserPagination
@@ -173,7 +171,7 @@ class GenreViewSet(mixins.CreateModelMixin,
 class TitleFilter(FilterSet):
     category = CharFilter(field_name='category__slug')
     genre = CharFilter(field_name='genre__slug')
-    name = CharFilter(field_name='name', lookup_expr='contains')
+    name = CharFilter(field_name='name', lookup_expr='icontains')
 
     class Meta:
         model = Title
@@ -185,8 +183,9 @@ class TitleViewSet(viewsets.ModelViewSet):
     serializer_class = TitleWriteSerializer
     permission_classes = [IsAdminOrReadOnly]
     pagination_class = UserPagination
-    filter_backends = (DjangoFilterBackend,)
+    filter_backends = (DjangoFilterBackend, filters.OrderingFilter)
     filterset_class = TitleFilter
+    ordering = ('pk')
 
     def get_serializer_class(self):
         if self.action == 'list' or self.action == 'retrieve':
