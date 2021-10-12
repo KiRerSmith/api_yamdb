@@ -49,7 +49,7 @@ class Command(BaseCommand):
         line_count = 0
         genre_slug = []
         try:
-            with open(file_path) as csv_file:
+            with open(file_path, encoding="utf8") as csv_file:
                 csv_reader = csv.reader(csv_file, delimiter=',')
                 self.clear_model()
                 for row in csv_reader:
