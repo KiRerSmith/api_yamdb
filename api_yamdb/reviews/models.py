@@ -10,6 +10,15 @@ CHOICES = (
 
 
 class User(AbstractUser):
+    admin = 'admin'
+    moderator = 'moderator'
+    user = 'user'
+    CHOICES = (
+        (admin, 'admin'),
+        (moderator, 'moderator'),
+        (user, 'user'),
+    )
+
     username = models.CharField(
         unique=True,
         blank=False,
@@ -25,13 +34,12 @@ class User(AbstractUser):
         blank=True,
         max_length=300,
     )
-    role = models.CharField(max_length=15, choices=CHOICES, default='user')
-    code = models.CharField(max_length=5, blank=True)
+    role = models.TextField(blank=False, choices=CHOICES, default=user)
 
     class Meta:
         constraints = (
-            models.UniqueConstraint(fields=["username", "email"],
-                                    name="uniq_signup"),
+            models.UniqueConstraint(fields=['username', 'email'],
+                                    name='uniq_signup'),
         )
 
 
@@ -42,9 +50,6 @@ class Category(models.Model):
     def __str__(self):
         return self.name[:20]
 
-    class Meta:
-        ordering = ['pk']
-
 
 class Genre(models.Model):
     name = models.CharField(max_length=256, verbose_name='Жанр')
@@ -52,9 +57,6 @@ class Genre(models.Model):
 
     def __str__(self):
         return self.name[:20]
-
-    class Meta:
-        ordering = ['pk']
 
 
 class Title(models.Model):
@@ -82,9 +84,6 @@ class Title(models.Model):
 
     def __str__(self):
         return self.name[:20]
-
-    class Meta:
-        ordering = ['pk']
 
 
 class GenreTitle(models.Model):

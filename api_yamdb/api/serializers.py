@@ -2,6 +2,7 @@ import datetime
 
 from rest_framework import serializers
 from rest_framework.serializers import ValidationError
+
 from reviews.models import Category, Comment, Genre, Review, Title, User
 
 
@@ -117,6 +118,8 @@ class UserSerializer(serializers.ModelSerializer):
         email = data.get('email')
         if User.objects.filter(username=username).exists():
             raise ValidationError('Такой пользователь уже существует')
+        if username == 'me':
+            raise ValidationError('Данный юзернейм недоступен')
         if User.objects.filter(email=email).exists():
             raise ValidationError('Пользователь с таким email уже существует')
         return data
