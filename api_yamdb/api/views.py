@@ -7,6 +7,8 @@ from django_filters.filters import CharFilter
 from django_filters.rest_framework import DjangoFilterBackend, FilterSet
 from rest_framework import filters, mixins, serializers, status, viewsets
 from rest_framework.decorators import api_view
+from rest_framework.fields import USE_READONLYFIELD
+from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import AccessToken
@@ -14,7 +16,7 @@ from reviews.models import Category, Comment, Genre, Review, Title, User
 
 from .pagination import UserPagination
 from .permissions import (IsAdmin, IsAdminOrReadOnly,
-                          IsOwnerAdminModeratorOrReadOnly)
+                          IsOwnerAdminModeratorOrReadOnly, MePermission)
 from .serializers import (CategorySerializer, CommentSerializer,
                           CreateAndGetCode, GenreSerializer,
                           GetTokenSerializer, MeSerializer, ReviewSerializer,
@@ -74,7 +76,7 @@ class UserViewSet(viewsets.ModelViewSet):
         serializer.save()
 
 
-class APIMe(APIView):
+'''class APIMe(APIView):
     def get(self, request):
         if request.user.is_authenticated:
             user = get_object_or_404(User, id=request.user.id)
@@ -96,8 +98,18 @@ class APIMe(APIView):
                 status=status.HTTP_400_BAD_REQUEST)
         return Response(
             'Необходима авторизация',
-            status=status.HTTP_401_UNAUTHORIZED)
+            status=status.HTTP_401_UNAUTHORIZED)'''
+#-------------------------
+class MeViewSet(mixins.RetrieveModelMixin, viewsets.GenericViewSet):
+    serializer_class = MeSerializer
+    permission_classes = (AllowAny,)
+    queryset = User.objects.all()
+    lookup_field = None
+    lookup_url_kwarg = None
 
+    def get_object(self):
+        return User.objects.get(id=self.request.user.id)
+#-------------------------
 
 class ReviewViewSet(viewsets.ModelViewSet):
     serializer_class = ReviewSerializer
