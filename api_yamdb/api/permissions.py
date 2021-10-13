@@ -19,7 +19,7 @@ class IsOwnerAdminModeratorOrReadOnly(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
         if request.method in permissions.SAFE_METHODS:
             return True
-        elif (request.user.role == User.admin
+        if (request.user.role == User.admin
               or request.user.role == User.moderator):
             return True
         return obj.author == request.user
