@@ -20,7 +20,7 @@ class IsOwnerAdminModeratorOrReadOnly(permissions.BasePermission):
         if request.method in permissions.SAFE_METHODS:
             return True
         if (request.user.role == User.admin
-            or request.user.role == User.moderator):
+                or request.user.role == User.moderator):
             return True
         return obj.author == request.user
 
