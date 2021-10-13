@@ -33,7 +33,9 @@ def create_and_get_code(request):
     username = serializer.validated_data.get('username')
     obj, created = User.objects.get_or_create(username=username, email=email)
     if created is False:
-        return Response('Такой пользователь уже существует', status=status.HTTP_400_BAD_REQUEST)
+        return Response(
+            'Такой пользователь уже существует',
+            status=status.HTTP_400_BAD_REQUEST)
     confirmation_code = confirmation_token.make_token(user=obj)
     message = f'Ваш код {confirmation_code}'
     send_mail(
