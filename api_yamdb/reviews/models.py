@@ -1,6 +1,8 @@
 from django.contrib.auth.models import AbstractUser
-from django.core.validators import MaxValueValidator, MinValueValidator
+from django.core.validators import MinValueValidator
 from django.db import models
+
+from .validators import MaxValueValidator
 
 CHOICES = (
     ('user', 'user'),
@@ -41,6 +43,7 @@ class User(AbstractUser):
         verbose_name_plural = 'Пользователи'
         ordering = ['username']
 
+
 class Category(models.Model):
     name = models.CharField(max_length=256, verbose_name='Категория')
     slug = models.SlugField(max_length=50, unique=True)
@@ -77,7 +80,7 @@ class Title(models.Model):
     year = models.IntegerField(
         validators=[
             MinValueValidator(1200),
-            MaxValueValidator(2100)
+            MaxValueValidator()
         ]
     )
     description = models.TextField(
