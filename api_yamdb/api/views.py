@@ -31,8 +31,10 @@ def create_and_get_code(request):
     serializer.is_valid(raise_exception=True)
     email = serializer.validated_data.get('email')
     username = serializer.validated_data.get('username')
-    user = User.objects.create(username=username, email=email)
-    confirmation_code = confirmation_token.make_token(user=user)
+    obj, created = User.objects.get_or_create(username=username, email=email)
+    if created is False:
+        return Response('Такой пользователь уже существует', status=status.HTTP_400_BAD_REQUEST)
+    confirmation_code = confirmation_token.make_token(user=obj)
     message = f'Ваш код {confirmation_code}'
     send_mail(
         subject='Код подтверждения для YAMDB',
