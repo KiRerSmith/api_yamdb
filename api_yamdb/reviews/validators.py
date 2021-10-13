@@ -6,7 +6,7 @@ from django.utils.translation import gettext_lazy as _
 
 
 @deconstructible
-class MaxValueValidator(BaseValidator):
+class MaxYearValidator(BaseValidator):
     message = _('Ensure this value is less than or equal to %(limit_value)s.')
     code = 'max_year_value'
 

@@ -1,8 +1,8 @@
 from django.contrib.auth.models import AbstractUser
-from django.core.validators import MinValueValidator
+from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 
-from .validators import MaxValueValidator
+from .validators import MaxYearValidator
 
 CHOICES = (
     ('user', 'user'),
@@ -80,7 +80,7 @@ class Title(models.Model):
     year = models.IntegerField(
         validators=[
             MinValueValidator(1200),
-            MaxValueValidator()
+            MaxYearValidator()
         ]
     )
     description = models.TextField(
