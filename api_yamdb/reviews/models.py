@@ -1,6 +1,8 @@
 from django.contrib.auth.models import AbstractUser
-from django.core.validators import MaxValueValidator, MinValueValidator
+from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
+
+from .validators import MaxYearValidator
 
 CHOICES = (
     ('user', 'user'),
@@ -21,31 +23,35 @@ class User(AbstractUser):
 
     username = models.CharField(
         unique=True,
-        blank=False,
-        null=False,
         max_length=150)
     email = models.EmailField(
         unique=True,
-        blank=False,
-        null=False,
         max_length=254)
     bio = models.CharField(
         'Биография',
         blank=True,
         max_length=300,
     )
-    role = models.TextField(blank=False, choices=CHOICES, default=user)
+    role = models.TextField(choices=CHOICES, default=user)
 
     class Meta:
         constraints = (
             models.UniqueConstraint(fields=['username', 'email'],
                                     name='uniq_signup'),
         )
+        verbose_name = 'Пользователь'
+        verbose_name_plural = 'Пользователи'
+        ordering = ['username']
 
 
 class Category(models.Model):
     name = models.CharField(max_length=256, verbose_name='Категория')
     slug = models.SlugField(max_length=50, unique=True)
+
+    class Meta:
+        verbose_name = 'Категория'
+        verbose_name_plural = 'Категории'
+        ordering = ['name']
 
     def __str__(self):
         return self.name[:20]
@@ -54,6 +60,11 @@ class Category(models.Model):
 class Genre(models.Model):
     name = models.CharField(max_length=256, verbose_name='Жанр')
     slug = models.SlugField(max_length=50, unique=True)
+
+    class Meta:
+        verbose_name = 'Жанр'
+        verbose_name_plural = 'Жанры'
+        ordering = ['name']
 
     def __str__(self):
         return self.name[:20]
@@ -69,7 +80,7 @@ class Title(models.Model):
     year = models.IntegerField(
         validators=[
             MinValueValidator(1200),
-            MaxValueValidator(2100)
+            MaxYearValidator()
         ]
     )
     description = models.TextField(
@@ -78,24 +89,16 @@ class Title(models.Model):
     )
     genre = models.ManyToManyField(
         Genre,
-        blank=True, null=True,
         related_name='genre_title'
     )
 
+    class Meta:
+        verbose_name = 'Произведение'
+        verbose_name_plural = 'Произведения'
+        ordering = ['name']
+
     def __str__(self):
         return self.name[:20]
-
-
-class GenreTitle(models.Model):
-    title_id = models.ForeignKey(
-        Title, on_delete=models.CASCADE,
-        related_name='title_id'
-    )
-    genre_id = models.ForeignKey(
-        Genre, on_delete=models.CASCADE,
-        blank=True, null=True,
-        related_name='genre_id'
-    )
 
 
 class Review(models.Model):
@@ -119,6 +122,9 @@ class Review(models.Model):
             models.UniqueConstraint(
                 fields=['author', 'title'], name='unique_review'),
         ]
+        verbose_name = 'Ревью'
+        verbose_name_plural = 'Ревью'
+        ordering = ['pub_date']
 
 
 class Comment(models.Model):
@@ -130,3 +136,8 @@ class Comment(models.Model):
                                related_name='comment')
     text = models.TextField()
     pub_date = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = 'Комментарии'
+        verbose_name_plural = 'Комментарии'
+        ordering = ['pub_date']
